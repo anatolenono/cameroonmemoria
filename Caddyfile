@@ -1,0 +1,46 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+
+registry.cameroonmemoria.com {
+
+    reverse_proxy localhost:5000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+        Docker-Distribution-Api-Version registry/3.0
+    }
+}
+
+minio.cameroonmemoria.com {
+    reverse_proxy localhost:9001
+}
+
+s3.cameroonmemoria.com {
+    reverse_proxy localhost:9000
+}
+
+pgadmin.cameroonmemoria.com {
+    reverse_proxy localhost:5050
+}
+
+cameroonmemoria.com {
+    reverse_proxy localhost:3000
+}
+
+:80 {
+    reverse_proxy localhost:3000
+}
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile

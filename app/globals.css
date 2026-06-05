@@ -1,0 +1,224 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Bellerose Light font - Local font file */
+@font-face {
+  font-family: 'Bellerose';
+  src: url('/fonts/Bellerose.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-roboto);
+  --font-serif: var(--font-georgia);
+  --font-display: var(--font-playfair);
+  --font-logo: var(--font-bellerose, var(--font-playfair));
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Typography - Font definitions */
+  --font-georgia: Georgia, 'Times New Roman', serif;
+  --font-bellerose: 'Bellerose', Georgia, serif;
+
+  /* Cameroon Memoria Brand Colors */
+  /* Terre Cuite (Primary) - #E67E73 */
+  --brand-terre-cuite: 230 126 115;
+  /* Pêche Claire - #FFC499 */
+  --brand-peche-claire: 255 196 153;
+  /* Kaki Doux Naturel - #C4B38A */
+  --brand-kaki-doux: 196 179 138;
+  /* Sable Clair / Fibre de Raphia - #E8DCC5 */
+  --brand-sable-clair: 232 220 197;
+  /* Blanc - #FFFFFF */
+  --brand-blanc: 255 255 255;
+  /* Gris Lavande Nocturne - #5A5C6C */
+  --brand-gris-lavande: 90 92 108;
+
+  /* Theme colors mapped to brand colors */
+  --background: oklch(0.98 0.01 45);
+  --foreground: oklch(0.4 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.4 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.4 0.02 260);
+  /* Primary: Terre Cuite (#E67E73) */
+  --primary: oklch(0.66 0.12 25);
+  --primary-foreground: oklch(1 0 0);
+  /* Secondary: Kaki Doux (#C4B38A) */
+  --secondary: oklch(0.76 0.04 75);
+  --secondary-foreground: oklch(0.3 0.02 260);
+  /* Muted: Sable Clair (#E8DCC5) */
+  --muted: oklch(0.89 0.03 75);
+  --muted-foreground: oklch(0.5 0.02 260);
+  /* Accent: Pêche Claire (#FFC499) */
+  --accent: oklch(0.85 0.08 55);
+  --accent-foreground: oklch(0.3 0.02 260);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.89 0.03 75);
+  --input: oklch(0.89 0.03 75);
+  /* Ring: Gris Lavande (#5A5C6C) */
+  --ring: oklch(0.42 0.02 260);
+  --chart-1: oklch(0.66 0.12 25);
+  --chart-2: oklch(0.85 0.08 55);
+  --chart-3: oklch(0.76 0.04 75);
+  --chart-4: oklch(0.89 0.03 75);
+  --chart-5: oklch(0.42 0.02 260);
+  --sidebar: oklch(0.98 0.01 45);
+  --sidebar-foreground: oklch(0.4 0.02 260);
+  --sidebar-primary: oklch(0.66 0.12 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.89 0.03 75);
+  --sidebar-accent-foreground: oklch(0.3 0.02 260);
+  --sidebar-border: oklch(0.89 0.03 75);
+  --sidebar-ring: oklch(0.42 0.02 260);
+}
+
+.dark {
+  /* Dark mode with Gris Lavande base */
+  --background: oklch(0.25 0.02 260);
+  --foreground: oklch(0.95 0.01 45);
+  --card: oklch(0.3 0.02 260);
+  --card-foreground: oklch(0.95 0.01 45);
+  --popover: oklch(0.3 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 45);
+  /* Primary: Terre Cuite (#E67E73) slightly adjusted */
+  --primary: oklch(0.7 0.12 25);
+  --primary-foreground: oklch(0.2 0.02 260);
+  /* Secondary: Kaki Doux */
+  --secondary: oklch(0.5 0.04 75);
+  --secondary-foreground: oklch(0.95 0.01 45);
+  /* Muted: Darker Sable Clair */
+  --muted: oklch(0.35 0.02 260);
+  --muted-foreground: oklch(0.75 0.02 75);
+  /* Accent: Pêche Claire */
+  --accent: oklch(0.6 0.08 55);
+  --accent-foreground: oklch(0.95 0.01 45);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.4 0.02 260);
+  --input: oklch(0.4 0.02 260);
+  --ring: oklch(0.7 0.12 25);
+  --chart-1: oklch(0.7 0.12 25);
+  --chart-2: oklch(0.85 0.08 55);
+  --chart-3: oklch(0.76 0.04 75);
+  --chart-4: oklch(0.89 0.03 75);
+  --chart-5: oklch(0.55 0.02 260);
+  --sidebar: oklch(0.28 0.02 260);
+  --sidebar-foreground: oklch(0.95 0.01 45);
+  --sidebar-primary: oklch(0.7 0.12 25);
+  --sidebar-primary-foreground: oklch(0.95 0.01 45);
+  --sidebar-accent: oklch(0.35 0.02 260);
+  --sidebar-accent-foreground: oklch(0.95 0.01 45);
+  --sidebar-border: oklch(0.4 0.02 260);
+  --sidebar-ring: oklch(0.7 0.12 25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Cameroon Memoria Brand Utilities */
+@layer utilities {
+  /* Brand Colors */
+  .bg-terre-cuite {
+    background-color: rgb(var(--brand-terre-cuite));
+  }
+  .text-terre-cuite {
+    color: rgb(var(--brand-terre-cuite));
+  }
+  .border-terre-cuite {
+    border-color: rgb(var(--brand-terre-cuite));
+  }
+
+  .bg-peche-claire {
+    background-color: rgb(var(--brand-peche-claire));
+  }
+  .text-peche-claire {
+    color: rgb(var(--brand-peche-claire));
+  }
+
+  .bg-kaki-doux {
+    background-color: rgb(var(--brand-kaki-doux));
+  }
+  .text-kaki-doux {
+    color: rgb(var(--brand-kaki-doux));
+  }
+
+  .bg-sable-clair {
+    background-color: rgb(var(--brand-sable-clair));
+  }
+  .text-sable-clair {
+    color: rgb(var(--brand-sable-clair));
+  }
+
+  .bg-gris-lavande {
+    background-color: rgb(var(--brand-gris-lavande));
+  }
+  .text-gris-lavande {
+    color: rgb(var(--brand-gris-lavande));
+  }
+
+  /* Brand Typography */
+  .font-deceased {
+    font-family: var(--font-georgia);
+  }
+
+  .font-display {
+    font-family: var(--font-playfair);
+  }
+
+  .font-body {
+    font-family: var(--font-roboto);
+  }
+
+  .font-logo {
+    font-family: var(--font-bellerose);
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+}

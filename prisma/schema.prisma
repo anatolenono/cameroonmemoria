@@ -1,0 +1,528 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Domaine Utilisateurs
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String?
+  name          String?
+  phoneNumber   String?        @unique
+  role          Role           @default(USER)
+  status        UserStatus     @default(ACTIVE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  profile       Profile?
+  wallet        Wallet?
+  announcements Announcement[]
+  announcementAdmins AnnouncementAdmin[] @relation("AnnouncementAdmins")
+  donations     Donation[]
+  condolences   Condolence[]
+  offerings     Offering[]
+  transactions  Transaction[]
+  provider      Provider?
+  marketplaceOrders MarketplaceOrder[]
+  emailVerified Boolean
+  image         String?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  phoneNumber String?
+  address     String?
+  country     String?
+  city        String?
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+  PROVIDER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+// Domaine Annonces
+
+model Announcement {
+  id                String             @id @default(cuid())
+  title             String
+  description       String?            @db.Text
+  type              AnnouncementType
+  status            AnnouncementStatus @default(PENDING)
+  isAnonymous       Boolean            @default(false)
+  deceasedName      String
+  deceasedPronoun   String?            // M., Mme, Mlle...
+  deceasedBirthDate DateTime?
+  deceasedBirthPlace String?           // Lieu de naissance
+  deceasedDeathDate DateTime
+  deceasedPhotoUrl  String?            // Optional photo of the deceased
+  ceremonyDate      DateTime?
+  ceremonyLocation  String?
+  /// List of events (as JSON array of objects with date, name, location)
+  events            Json?
+  relationship      String?            // Added field for relationship to deceased (private field)
+  bannerPresetId    String?            // Reference to banner preset (if using preset)
+  bannerPreset      BannerPreset?      @relation(fields: [bannerPresetId], references: [id])
+  bannerCustomUrl   String?            // Custom uploaded banner URL (MinIO path)
+  plan              AnnouncementPlan   @default(FREE)
+  planPaidAt        DateTime?          // When plan was upgraded (null = free)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  userId            String?
+  user              User?              @relation(fields: [userId], references: [id])
+  admins            AnnouncementAdmin[]
+  media             Media[]
+  donations         Donation[]
+  condolences       Condolence[]
+  offerings         Offering[]
+  marketplaceOrders MarketplaceOrder[]
+  payments          Payment[]
+}
+
+model AnnouncementAdmin {
+  id             String       @id @default(cuid())
+  announcementId String
+  userId         String
+  role           String       @default("ADMIN") // CREATOR, ADMIN, VIEWER
+  addedAt        DateTime     @default(now())
+
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user           User         @relation("AnnouncementAdmins", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+}
+
+model Media {
+  id             String       @id @default(cuid())
+  url            String
+  type           MediaType
+  createdAt      DateTime     @default(now())
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+}
+
+enum AnnouncementType {
+  DEATH_NOTICE  // Avis de décès - announcement of passing
+  FUNERAL       // Funérailles - funeral ceremony details
+  ANNIVERSARY
+  THANKS
+  OTHER
+}
+
+enum AnnouncementStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+}
+
+enum AnnouncementPlan {
+  FREE      // 0 F CFA - photo unique non modifiable
+  ESSENTIAL // 5,000 F CFA - photo modifiable, déroulé obsèques détaillé
+  COMPLETE  // 10,000 F CFA - galerie, vidéos, biographie, témoignages
+  PREMIUM   // 15,000 F CFA - galerie illimitée, cagnotte, livestream
+}
+
+enum MediaType {
+  IMAGE
+  DOCUMENT
+  OTHER
+}
+
+// Domaine Finances
+
+model Wallet {
+  id           String        @id @default(cuid())
+  balance      Float         @default(0)
+  currency     String        @default("XAF")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  description String?
+  currency    String            @default("XAF")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  walletId    String?
+  wallet      Wallet?           @relation(fields: [walletId], references: [id])
+  donation    Donation?
+}
+
+model Donation {
+  id             String       @id @default(cuid())
+  amount         Float
+  message        String?      @db.Text
+  isAnonymous    Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  transactionId  String       @unique
+  transaction    Transaction  @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+}
+
+model Payment {
+  id                 String         @id @default(cuid())
+  amount             Float
+  currency           String         @default("XAF")
+  paymentSource      PaymentSource
+  paymentType        PaymentType
+  status             PaymentStatus  @default(PENDING)
+
+  // References
+  announcementId     String?        // Plan upgrade ou fundraiser
+  announcement       Announcement?  @relation(fields: [announcementId], references: [id], onDelete: SetNull)
+
+  providerId         String?        // Prestation prestataire
+  provider           Provider?      @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  // External payment IDs
+  stripePaymentId    String?        @unique
+  orangeMoneyId      String?        @unique
+  momoId             String?        @unique
+
+  createdAt          DateTime       @default(now())
+  completedAt        DateTime?
+}
+
+enum PaymentSource {
+  STRIPE
+  ORANGE_MONEY
+  MOMO
+}
+
+enum PaymentType {
+  PLAN_UPGRADE   // Plan tarifaire annonce (ESSENTIAL, COMPLETE, PREMIUM)
+  PRESTATION     // Service prestataire
+  FUNDRAISER     // Cagnotte
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum TransactionType {
+  DONATION
+  WITHDRAWAL
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+// Domaine Interactions
+
+model Condolence {
+  id             String       @id @default(cuid())
+  message        String       @db.Text
+  isAnonymous    Boolean      @default(false)
+  isApproved     Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+}
+
+enum OfferingType {
+  FLOWER
+  CANDLE
+}
+
+model Offering {
+  id             String       @id @default(cuid())
+  type           OfferingType
+  createdAt      DateTime     @default(now())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// Domaine Bannières
+
+model BannerPreset {
+  id            String         @id @default(cuid())
+  name          String         // Display name: "Coral Red", "Ocean Gradient", "James Webb"
+  type          BannerType     // COLOR, GRADIENT, or PHOTO - for UI grouping/filtering
+  imageUrl      String         // MinIO path: /banners/colors/coral-red.webp
+  thumbnailUrl  String?        // Optional smaller version for picker grid (200x67)
+  category      String?        // Optional sub-category: "Space", "NASA", "Warm", "Cool"
+  isActive      Boolean        @default(true)
+  displayOrder  Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  announcements Announcement[]
+
+  @@index([isActive, type, displayOrder])
+  @@index([isActive, category, displayOrder])
+}
+
+enum BannerType {
+  COLOR    // Solid color backgrounds
+  GRADIENT // Gradient backgrounds
+  PHOTO    // Real photos (James Webb, NASA, etc.)
+}
+
+// ─── Domaine Marketplace ──────────────────────────────────────────────────────
+
+enum ProviderStatus {
+  PENDING    // En attente de validation admin
+  ACTIVE     // Validé et actif
+  SUSPENDED  // Suspendu par l'admin
+}
+
+enum ActivationFeeStatus {
+  PENDING  // Frais non encore payés
+  PAID     // Frais payés
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT  // Paiement attendu
+  PAID             // Paiement confirmé
+  ASSIGNED         // Assignée à un prestataire
+  IN_PROGRESS      // En cours de traitement
+  DELIVERED        // Prestation effectuée
+  CANCELLED
+  REFUNDED
+}
+
+enum OrderType {
+  RECENT_DEATH    // Décès récent
+  COMMEMORATION   // Anniversaire de décès
+}
+
+enum MarketplaceInvoiceType {
+  CLIENT    // Facture client final
+  PROVIDER  // Facture prestataire (avec décomposition commission)
+}
+
+enum MarketplaceInvoiceStatus {
+  PENDING  // Pas encore versé au prestataire
+  PAID     // Versé au prestataire
+}
+
+model MarketplaceCategory {
+  id           String            @id @default(cuid())
+  name         String
+  description  String?
+  slug         String            @unique
+  imageUrl     String?
+  isActive     Boolean           @default(true)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  providers    Provider[]
+  products     ProviderProduct[]
+}
+
+model Provider {
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            MarketplaceCategory @relation(fields: [categoryId], references: [id])
+  status              ProviderStatus      @default(PENDING)
+  // Infos entreprise
+  companyName         String
+  companyAddress      String?
+  companyCity         String?
+  companyPhone        String?
+  companyEmail        String?
+  companyDescription  String?             @db.Text
+  // Infos représentant
+  repName             String
+  repPhone            String
+  repEmail            String?
+  // Mobile Money
+  mobileMoneyNumber   String?
+  mobileMoneyOperator String?
+  // Tarification CameronMemoria
+  commissionRate      Float               @default(10)
+  // Notes admin internes
+  adminNotes          String?             @db.Text
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  products            ProviderProduct[]
+  activation          ProviderActivation?
+  assignedOrders      MarketplaceOrder[]
+  providerInvoices    MarketplaceInvoice[]
+  payments            Payment[]
+}
+
+model ProviderActivation {
+  id           String              @id @default(cuid())
+  providerId   String              @unique
+  provider     Provider            @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  baseAmount   Float
+  discountPct  Float               @default(0)
+  finalAmount  Float
+  status       ActivationFeeStatus @default(PENDING)
+  paidAt       DateTime?
+  notes        String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+}
+
+model ProviderProduct {
+  id           String              @id @default(cuid())
+  providerId   String
+  provider     Provider            @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  categoryId   String
+  category     MarketplaceCategory @relation(fields: [categoryId], references: [id])
+  name         String
+  description  String?             @db.Text
+  price        Float
+  currency     String              @default("XAF")
+  imageUrl     String?
+  conditions   String?             @db.Text
+  isActive     Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  orderItems   MarketplaceOrderItem[]
+}
+
+model MarketplaceOrder {
+  id                  String               @id @default(cuid())
+  clientId            String
+  client              User                 @relation(fields: [clientId], references: [id])
+  status              OrderStatus          @default(PENDING_PAYMENT)
+  orderType           OrderType
+  totalAmount         Float
+  currency            String               @default("XAF")
+  paymentMethod       String?
+  paymentReference    String?
+  paidAt              DateTime?
+  announcementId      String?
+  announcement        Announcement?        @relation(fields: [announcementId], references: [id])
+  deceasedName        String?
+  clientInstructions  String?              @db.Text
+  assignedProviderId  String?
+  assignedProvider    Provider?            @relation(fields: [assignedProviderId], references: [id])
+  assignedAt          DateTime?
+  assignmentNote      String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  items               MarketplaceOrderItem[]
+  invoices            MarketplaceInvoice[]
+}
+
+model MarketplaceOrderItem {
+  id             String           @id @default(cuid())
+  orderId        String
+  order          MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String
+  product        ProviderProduct  @relation(fields: [productId], references: [id])
+  productName    String
+  productPrice   Float
+  quantity       Int              @default(1)
+  subtotal       Float
+  createdAt      DateTime         @default(now())
+}
+
+model MarketplaceInvoice {
+  id               String                   @id @default(cuid())
+  orderId          String
+  order            MarketplaceOrder         @relation(fields: [orderId], references: [id])
+  providerId       String?
+  provider         Provider?                @relation(fields: [providerId], references: [id])
+  type             MarketplaceInvoiceType
+  invoiceNumber    String                   @unique
+  totalAmount      Float
+  commissionAmount Float?
+  providerAmount   Float?
+  status           MarketplaceInvoiceStatus @default(PENDING)
+  paidAt           DateTime?
+  pdfUrl           String?
+  issuedAt         DateTime                 @default(now())
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+}

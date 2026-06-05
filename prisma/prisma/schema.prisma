@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle User (utilisateurs, rôles, authentification)
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String?
+  name          String
+  role          Role     @default(USER)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  announcements Announcement[]
+  donations     Donation[]
+  condolences   Condolence[]
+  wallet        Wallet?
+  transactions  Transaction[]
+}
+
+// Rôles d'utilisateur
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+// Modèle Announcement (annonces)
+model Announcement {
+  id            String    @id @default(uuid())
+  title         String
+  description   String    @db.Text
+  dateOfDeath   DateTime
+  dateOfFuneral DateTime?
+  location      String?
+  isAnonymous   Boolean   @default(false)
+  status        Status    @default(PENDING)
+  coverImageUrl String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id])
+  donations   Donation[]
+  condolences Condolence[]
+  gallery     Gallery[]
+}
+
+// Statut des annonces
+enum Status {
+  PENDING
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+// Modèle Donation (dons)
+model Donation {
+  id            String        @id @default(uuid())
+  amount        Float
+  currency      String        @default("XAF")
+  message       String?       @db.Text
+  isAnonymous   Boolean       @default(false)
+  status        PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod
+  paymentId     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  transaction    Transaction?
+}
+
+// Modèle Condolence (condoléances)
+model Condolence {
+  id          String   @id @default(uuid())
+  message     String   @db.Text
+  isAnonymous Boolean  @default(false)
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+}
+
+// Modèle Wallet (portefeuille)
+model Wallet {
+  id        String   @id @default(uuid())
+  balance   Float    @default(0)
+  currency  String   @default("XAF")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+}
+
+// Modèle Transaction (transactions financières)
+model Transaction {
+  id          String          @id @default(uuid())
+  type        TransactionType
+  amount      Float
+  currency    String          @default("XAF")
+  fee         Float           @default(0)
+  status      PaymentStatus   @default(PENDING)
+  description String?
+  reference   String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  walletId   String?
+  wallet     Wallet?   @relation(fields: [walletId], references: [id])
+  donationId String?   @unique
+  donation   Donation? @relation(fields: [donationId], references: [id])
+}
+
+// Type de transaction
+enum TransactionType {
+  DONATION_RECEIVED
+  WITHDRAWAL
+  REFUND
+  SYSTEM_ADJUSTMENT
+}
+
+// Statut de paiement
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// Méthode de paiement
+enum PaymentMethod {
+  MOBILE_MONEY
+  CREDIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+// Modèle Gallery (images associées aux annonces)
+model Gallery {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+}

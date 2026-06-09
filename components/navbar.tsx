@@ -110,14 +110,23 @@ export function Navbar() {
             />
           </Link>
 
-          {/* Desktop: Create announcement button */}
+          {/* Desktop: Create announcement button or Propose services for provider */}
           <div className="flex items-center space-x-2 md:space-x-4">
-            <Button asChild className="hidden md:flex">
-              <Link href="/announcements/create">
-                <Plus className="h-4 w-4 mr-2" />
-                Créer une annonce
-              </Link>
-            </Button>
+            {isProvider ? (
+              <Button asChild className="hidden md:flex">
+                <Link href="/provider/products">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Proposer mes services
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild className="hidden md:flex">
+                <Link href="/announcements/create">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Créer une annonce
+                </Link>
+              </Button>
+            )}
 
             {/* Mobile: User avatar or login + Menu button */}
             <div className="flex items-center gap-2 md:hidden">
@@ -239,26 +248,49 @@ export function Navbar() {
                       <span>Profil</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/announcements/my">
-                      <Heart className="mr-2 h-4 w-4" />
-                      <span>Mes annonces</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  {!isProvider && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile/wallet">
-                        <Wallet className="mr-2 h-4 w-4" />
-                        <span>Mon portefeuille</span>
-                      </Link>
-                    </DropdownMenuItem>
+                  {isProvider ? (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/provider/products">
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Mes produits/services</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/provider/orders">
+                          <Heart className="mr-2 h-4 w-4" />
+                          <span>Mes commandes</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/provider/revenue">
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          <span>Mes revenus</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/announcements/my">
+                          <Heart className="mr-2 h-4 w-4" />
+                          <span>Mes annonces</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/wallet">
+                          <Wallet className="mr-2 h-4 w-4" />
+                          <span>Mon portefeuille</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/donations">
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          <span>Mes donations</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile/donations">
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      <span>Mes donations</span>
-                    </Link>
-                  </DropdownMenuItem>
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
@@ -299,12 +331,21 @@ export function Navbar() {
 
             {/* Primary Action Button */}
             <div className="mb-6">
-              <Button asChild className="w-full h-12 text-base rounded-lg shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
-                <Link href="/announcements/create">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Créer une annonce
-                </Link>
-              </Button>
+              {isProvider ? (
+                <Button asChild className="w-full h-12 text-base rounded-lg shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/provider/products">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Proposer mes services
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild className="w-full h-12 text-base rounded-lg shadow-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/announcements/create">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Créer une annonce
+                  </Link>
+                </Button>
+              )}
             </div>
 
             {/* Navigation Section */}
@@ -397,32 +438,61 @@ export function Navbar() {
                   <User className="h-4 w-4 mr-3" />
                   Mon profil
                 </Link>
-                <Link
-                  href="/announcements/my"
-                  className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Heart className="h-4 w-4 mr-3" />
-                  Mes annonces
-                </Link>
-                {!isProvider && (
-                  <Link
-                    href="/profile/wallet"
-                    className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Wallet className="h-4 w-4 mr-3" />
-                    Mon portefeuille
-                  </Link>
+                {isProvider ? (
+                  <>
+                    <Link
+                      href="/provider/products"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Plus className="h-4 w-4 mr-3" />
+                      Mes produits/services
+                    </Link>
+                    <Link
+                      href="/provider/orders"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Heart className="h-4 w-4 mr-3" />
+                      Mes commandes
+                    </Link>
+                    <Link
+                      href="/provider/revenue"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <DollarSign className="h-4 w-4 mr-3" />
+                      Mes revenus
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/announcements/my"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Heart className="h-4 w-4 mr-3" />
+                      Mes annonces
+                    </Link>
+                    <Link
+                      href="/profile/wallet"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Wallet className="h-4 w-4 mr-3" />
+                      Mon portefeuille
+                    </Link>
+                    <Link
+                      href="/profile/donations"
+                      className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <DollarSign className="h-4 w-4 mr-3" />
+                      Mes donations
+                    </Link>
+                  </>
                 )}
-                <Link
-                  href="/profile/donations"
-                  className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <DollarSign className="h-4 w-4 mr-3" />
-                  Mes donations
-                </Link>
                 <button
                   onClick={() => {
                     handleLogout();

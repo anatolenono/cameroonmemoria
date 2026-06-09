@@ -60,6 +60,7 @@ export function LoginForm() {
         setError(result.error);
       } else {
         router.refresh();
+        await new Promise(resolve => setTimeout(resolve, 500));
         router.push('/');
       }
     } catch (error) {

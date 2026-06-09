@@ -1,13 +1,11 @@
-import 'better-auth/client';
-
-declare module 'better-auth/client' {
+declare module 'better-auth' {
   interface User {
     role?: string;
   }
-}
 
-declare module 'better-auth/types' {
-  interface User {
-    role?: string;
+  interface Session {
+    user: User & {
+      role?: string;
+    };
   }
 }

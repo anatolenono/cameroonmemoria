@@ -59,6 +59,7 @@ export function LoginForm() {
       if ('error' in result) {
         setError(result.error);
       } else {
+        router.refresh();
         router.push('/');
       }
     } catch (error) {

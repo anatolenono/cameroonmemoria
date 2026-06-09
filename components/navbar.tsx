@@ -90,6 +90,7 @@ export function Navbar() {
 
   // Obtenir les informations utilisateur
   const user = session?.user;
+  const isProvider = user?.role === 'PROVIDER';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -243,12 +244,14 @@ export function Navbar() {
                       <span>Mes annonces</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile/wallet">
-                      <Wallet className="mr-2 h-4 w-4" />
-                      <span>Mon portefeuille</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  {!isProvider && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile/wallet">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        <span>Mon portefeuille</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/profile/donations">
                       <DollarSign className="mr-2 h-4 w-4" />
@@ -401,14 +404,16 @@ export function Navbar() {
                   <Heart className="h-4 w-4 mr-3" />
                   Mes annonces
                 </Link>
-                <Link
-                  href="/profile/wallet"
-                  className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Wallet className="h-4 w-4 mr-3" />
-                  Mon portefeuille
-                </Link>
+                {!isProvider && (
+                  <Link
+                    href="/profile/wallet"
+                    className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Wallet className="h-4 w-4 mr-3" />
+                    Mon portefeuille
+                  </Link>
+                )}
                 <Link
                   href="/profile/donations"
                   className="flex items-center py-3 px-3 rounded-lg text-sm font-medium text-gris-lavande hover:bg-sable-clair/50 transition-all duration-200"

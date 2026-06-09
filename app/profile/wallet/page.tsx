@@ -111,6 +111,11 @@ export default function WalletPage() {
       return;
     }
 
+    if (session?.user?.role === 'PROVIDER') {
+      router.push("/");
+      return;
+    }
+
     if (session?.user) {
       fetchWallet();
     }

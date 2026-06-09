@@ -22,6 +22,8 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
+  const isProvider = session.user.role === 'PROVIDER';
+
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-2xl space-y-8">
@@ -91,8 +93,8 @@ export default async function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Wallet & Donations */}
-        <WalletSection />
+        {/* Wallet & Donations - Hidden for Providers */}
+        {!isProvider && <WalletSection />}
 
         <div className="flex justify-center mt-6">
           <Button

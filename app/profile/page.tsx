@@ -22,7 +22,7 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
-  const isProvider = session.user.role === 'PROVIDER';
+  const isProvider = (session.user as any).role === 'PROVIDER';
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

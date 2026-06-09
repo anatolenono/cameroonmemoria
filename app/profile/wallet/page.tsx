@@ -111,7 +111,7 @@ export default function WalletPage() {
       return;
     }
 
-    if (session?.user?.role === 'PROVIDER') {
+    if ((session?.user as any)?.role === 'PROVIDER') {
       router.push("/");
       return;
     }

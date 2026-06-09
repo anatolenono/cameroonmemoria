@@ -18,6 +18,15 @@ export const auth = betterAuth({
   secret: process.env.AUTH_SECRET || 'votre-clé-secrète-temporaire-de-développement',
   baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
 
+  // Expose custom user fields in session
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+      },
+    },
+  },
+
   // Configuration des stratégies d'authentification
   emailAndPassword: {
     enabled: true,

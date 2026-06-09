@@ -22,6 +22,7 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isProvider = (session.user as any).role === 'PROVIDER';
 
   return (

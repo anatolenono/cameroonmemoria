@@ -111,6 +111,7 @@ export default function WalletPage() {
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((session?.user as any)?.role === 'PROVIDER') {
       router.push("/");
       return;

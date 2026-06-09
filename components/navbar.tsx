@@ -90,6 +90,7 @@ export function Navbar() {
 
   // Obtenir les informations utilisateur
   const user = session?.user;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isProvider = (user as any)?.role === 'PROVIDER';
 
   return (

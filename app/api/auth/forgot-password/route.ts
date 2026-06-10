@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     // Use better-auth's built-in password reset functionality
     // This will generate a token, store it in verification table, and trigger sendResetPassword callback
-    await auth.api.forgetPassword({
+    await auth.api.requestPasswordReset({
       body: {
         email,
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password`,

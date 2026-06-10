@@ -42,7 +42,7 @@ export async function GET() {
 
     // Calculate stats
     const paidInvoices = invoices.filter((inv: typeof invoices[0]) => inv.status === 'PAID');
-    const totalRevenue = paidInvoices.reduce((sum: number, inv: typeof invoices[0]) => sum + inv.amount, 0);
+    const totalRevenue = paidInvoices.reduce((sum: number, inv: typeof invoices[0]) => sum + (inv.totalAmount || 0), 0);
 
     return NextResponse.json({
       invoices,

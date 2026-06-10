@@ -36,6 +36,8 @@ import {
   LogOut,
   ChevronUp,
   Home,
+  ShoppingCart,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,6 +52,16 @@ const providerMenuItems = [
     title: "Mes produits",
     url: "/provider/products",
     icon: Package,
+  },
+  {
+    title: "Mes commandes",
+    url: "/provider/orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Mes revenus",
+    url: "/provider/revenue",
+    icon: TrendingUp,
   },
 ];
 

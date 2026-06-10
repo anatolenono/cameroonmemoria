@@ -33,9 +33,8 @@ export const createAnnouncementSchema = z.object({
     .max(100, "Le nom ne peut pas dépasser 100 caractères")
     .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Le nom ne peut contenir que des lettres, espaces, apostrophes et tirets"),
   deceasedPronoun: z.enum(["M.", "Mme", "Mlle"], {
-    required_error: "Veuillez sélectionner la civilité du défunt",
     invalid_type_error: "Civilité invalide",
-  }),
+  }).optional(),
   relationship: z.string().min(1, "Le lien avec le défunt est requis"),
   relationshipOther: z.string().optional(),
   birthDate: z

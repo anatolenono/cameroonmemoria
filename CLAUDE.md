@@ -206,7 +206,7 @@ All accounts:
 - Hostname: `v71234.webmo.fr`
 - IP: `94.247.177.10`
 - User: `anno`
-- SSH Key: `C:\Users\no_ka\.ssh\vps_tamtamfoot` (Ed25519, passphrase: `sapristti`)
+- SSH Key: `C:\Users\no_ka\vps_tamtamfoot_new` (Ed25519, passphrase: `sapristti`)
 - Root password: `SaperlipopetteX` (SSH key auth only, no password auth)
 - Sudo password: `Nathis!007`
 
@@ -255,7 +255,7 @@ ADMIN_PASSWORD=asdaRe11naA
 
 **1. SSH to VPS:**
 ```bash
-ssh -i "C:\Users\no_ka\.ssh\vps_tamtamfoot" anno@94.247.177.10
+ssh -i C:\Users\no_ka\vps_tamtamfoot_new anno@94.247.177.10
 # Passphrase: sapristti
 ```
 

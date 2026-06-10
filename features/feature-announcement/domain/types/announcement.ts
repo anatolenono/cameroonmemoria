@@ -101,6 +101,8 @@ export interface UpdateAnnouncementDto {
   events?: EventItem[];
   relationship?: string;
   mediaIds?: string[];
+  bannerPresetId?: string;
+  bannerCustomUrl?: string;
 }
 
 export interface AnnouncementQuery {

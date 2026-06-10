@@ -340,14 +340,8 @@ export function CreateAnnouncementForm({
   const handleFormSubmit = (data: CreateAnnouncementFormData) => {
     console.log('handleFormSubmit called', { data, bannerSelection, mode });
 
-    if (mode === 'create') {
-      if (!bannerSelection) {
-        console.log('Banner selection missing!');
-        setBannerError('Veuillez sélectionner une bannière');
-        return;
-      } else {
-        setBannerError(null);
-      }
+    if (mode === 'create' && bannerSelection) {
+      setBannerError(null);
     }
     // Inject registration fields if not logged in
     if (!isLoggedIn) {
@@ -365,8 +359,8 @@ export function CreateAnnouncementForm({
       data.relationship = data.relationshipOther ?? "";
     }
 
-    // Add banner information to data in create mode
-    if (mode === 'create' && bannerSelection) {
+    // Add banner information to data in both create and edit modes
+    if (bannerSelection) {
       data.bannerPresetId = bannerSelection.presetId;
       data.bannerCustomUrl = bannerSelection.customUrl;
       data.bannerCustomColor = bannerSelection.customColor;

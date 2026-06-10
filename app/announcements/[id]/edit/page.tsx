@@ -52,7 +52,7 @@ export default function EditAnnouncementPage() {
           title: a.title || "",
           description: a.description || "",
           deceasedName: a.deceasedName || "",
-          deceasedPronoun: (a.deceasedPronoun as "M." | "Mme" | "Mlle") || "M.",
+          deceasedPronoun: (a.deceasedPronoun as "M." | "Mme" | "Mlle" | undefined) || undefined,
           birthDate: a.deceasedBirthDate || undefined,
           birthPlace: a.deceasedBirthPlace || "",
           deathDate: a.deceasedDeathDate,

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { createAccountCredentials, hashPassword } from './utils';
+import { createAccountCredentials } from './utils';
 import { seedBanners } from './banners';
 
 const prisma = new PrismaClient();
@@ -10,7 +10,6 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL!;
   const adminPassword = process.env.ADMIN_PASSWORD!;
   const adminName = process.env.ADMIN_NAME || 'Administrateur Cameroon Memoria';
-  const hashedPassword = await hashPassword(adminPassword);
 
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail }
@@ -34,7 +33,6 @@ async function main() {
         data: {
           role: 'ADMIN',
           name: adminName,
-          password: hashedPassword,
           profile: {
             upsert: {
               update: {

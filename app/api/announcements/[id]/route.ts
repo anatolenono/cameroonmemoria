@@ -85,7 +85,9 @@ export async function PUT(
       ceremonyDate: body.ceremonyDate,
       ceremonyLocation: body.ceremonyLocation,
       mediaIds: body.mediaIds,
-      relationship: body.relationship
+      relationship: body.relationship,
+      bannerPresetId: body.bannerPresetId,
+      bannerCustomUrl: body.bannerCustomUrl
     };
 
     const announcement = await announcementService.updateAnnouncement(id, updateData);
